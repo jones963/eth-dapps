@@ -1,6 +1,6 @@
 import { ethers } from 'ethers';
 import TOKEN_ABI from '../contracts/USDT.json';
-import { TOKEN_ADDRESSES, TOKEN_DECIMALS } from '../utils/constants';
+import { TOKEN_ADDRESSES } from '../utils/constants';
 export class ContractService {
 constructor(provider) {
 this.provider = provider;
@@ -19,7 +19,7 @@ try {
 const contract = new ethers.Contract(tokenAddress, TOKEN_ABI, provider);
 const rawBalance = await contract.balanceOf(address);
 
-const decimals = TOKEN_DECIMALS[symbol] || 18;
+const decimals = Number(await contract.decimals());
 const formatted = parseFloat(ethers.formatUnits(rawBalance, decimals)).toFixed(4);
 if (parseFloat(formatted) > 0) {
 balances.tokens.push({ symbol, address: tokenAddress, balance: formatted });

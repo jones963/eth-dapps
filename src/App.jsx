@@ -10,6 +10,14 @@ function formatUnits(rawValue, decimals, displayPlaces = 6) {
   return formattedFraction ? `${whole}.${formattedFraction}` : whole.toString();
 }
 
+function parseChainId(value) {
+  if (typeof value === 'number' && Number.isSafeInteger(value)) return value;
+  if (typeof value !== 'string') return null;
+  if (/^0x[0-9a-f]+$/i.test(value)) return Number.parseInt(value.slice(2), 16);
+  if (/^\d+$/.test(value)) return Number(value);
+  return null;
+}
+
 function App() {
   const [walletProvider, setWalletProvider] = useState(null);
   const [address, setAddress] = useState(null);
@@ -38,13 +46,19 @@ function App() {
     };
   }, [walletProvider]);
 
-  const chainNumber = chainId ? Number.parseInt(chainId, 16) : null;
+  const chainNumber = parseChainId(chainId);
   const chainName = ({
     1: 'Ethereum Mainnet',
     56: 'BNB Smart Chain',
     137: 'Polygon',
   })[chainNumber] ?? (chainNumber ? `Chain ${chainNumber}` : 'unknown network');
   const nativeSymbol = ({ 1: 'ETH', 56: 'BNB', 137: 'POL' })[chainNumber] ?? 'Native';
+  const usdtStandard = ({ 1: 'ERC-20', 56: 'BEP-20', 137: 'ERC-20' })[chainNumber];
+  const usdtDescription = isConnected
+    ? usdtStandard
+      ? `${usdtStandard} · ${chainName}`
+      : `Not configured · ${chainName}`
+    : 'ERC-20 & BEP-20 · supported networks';
 
   useEffect(() => {
     if (!walletProvider || !address || !chainNumber) {
@@ -137,7 +151,7 @@ function App() {
 
       setWalletProvider(provider);
       setAddress(accounts[0]);
-      setChainId(typeof nextChainId === 'string' ? nextChainId : null);
+      setChainId(nextChainId);
     } catch (error) {
       setConnectError(error instanceof Error ? error.message : String(error));
     } finally {
@@ -235,7 +249,7 @@ function App() {
               <span className="asset-icon usdt">$</span>
               <span className="asset-name">
                 <strong>USDT</strong>
-                <small>ERC-20 · {isConnected ? chainName : 'selected network'}</small>
+                <small>{usdtDescription}</small>
               </span>
               <span className="asset-value">
                 {isLoadingBalances ? 'Loading…' : balances?.usdt ?? '—'}
