@@ -220,6 +220,32 @@ button:disabled {
   padding: 24px 28px 8px;
 }
 
+.destination-field {
+  display: grid;
+  gap: 7px;
+  margin: 0 0 16px;
+  color: #344054;
+  font-size: 0.83rem;
+  font-weight: 650;
+}
+
+.destination-field input {
+  width: 100%;
+  box-sizing: border-box;
+  min-height: 42px;
+  padding: 0 12px;
+  border: 1px solid #d0d5dd;
+  border-radius: 8px;
+  color: #182230;
+  font: inherit;
+}
+
+.destination-field small {
+  color: #667085;
+  font-size: 0.76rem;
+  font-weight: 400;
+}
+
 .section-heading {
   margin-bottom: 14px;
 }
